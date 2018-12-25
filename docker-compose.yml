@@ -1,0 +1,52 @@
+version: '3.2'
+services:
+  app:
+    build:
+      context: ./docker/app
+    ports:
+      - 8000:80
+      - 443:443
+    volumes:
+      - .:/var/www/html:cached
+    networks:
+      - local
+  redis:
+    build:
+      context: ./docker/redis
+    volumes:
+      - redisdata:/data
+    networks:
+      - local
+
+  mysql:
+    build:
+      context: ./docker/mysql
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: asgardcms
+      MYSQL_USER: homestead
+      MYSQL_PASSWORD: secret
+    volumes:
+      - mysqldata:/var/lib/mysql
+    networks:
+      - local
+
+  blackfire:
+    image: blackfire/blackfire
+    environment:
+      BLACKFIRE_SERVER_ID:
+      BLACKFIRE_SERVER_TOKEN:
+    networks:
+      - local
+
+volumes:
+  redisdata:
+    driver: local
+  mysqldata:
+    driver: local
+
+networks:
+  local:
+    driver: bridge
